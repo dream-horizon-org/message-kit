@@ -22,7 +22,7 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 @Slf4j
 public class SqsConsumer implements MessageConsumer {
 
-  private static final String RECEIPT_HANDLE = "receiptHandle";
+  private static final String RECEIPT_HANDLE = "RECEIPT_HANDLE";
   private final SqsClient sqsClient;
 
   @Getter private final SqsConfig sqsConfig;
@@ -172,6 +172,6 @@ public class SqsConsumer implements MessageConsumer {
   }
 
   private String getReceiptHandle(Message message) {
-    return message.getAttributes().get("RECEIPT_HANDLE").toString();
+    return message.getAttributes().get(RECEIPT_HANDLE).toString();
   }
 }
