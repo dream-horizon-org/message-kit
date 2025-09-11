@@ -1,5 +1,6 @@
 package com.dream11.queue.impl.sqs;
 
+import com.dream11.queue.Message;
 import com.dream11.queue.consumer.MessageConsumer;
 import java.util.List;
 import java.util.Map;
@@ -9,17 +10,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
-import software.amazon.awssdk.services.sqs.model.Message;
 
 /**
  * Implementation of MessageConsumer for Amazon SQS. This consumer handles receiving and
  * acknowledging messages from an SQS queue.
  */
 @Slf4j
-public class SqsConsumer implements MessageConsumer<Message> {
+public class SqsConsumer implements MessageConsumer {
+
+  private static final String RECEIPT_HANDLE = "receiptHandle";
   private final SqsClient sqsClient;
 
   @Getter private final SqsConfig sqsConfig;
@@ -84,6 +87,8 @@ public class SqsConsumer implements MessageConsumer<Message> {
     return this.sqsClient
         .receive(timeout)
         .thenApply(
+            messages -> messages.stream().map(this::buildMessage).collect(Collectors.toList()))
+        .thenApply(
             messages -> {
               if (this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval() > 0) {
                 this.sendHeartbeats(messages);
@@ -102,10 +107,10 @@ public class SqsConsumer implements MessageConsumer<Message> {
   @Override
   public CompletableFuture<Void> acknowledgeMessage(Message message) {
     return this.sqsClient
-        .deleteMessage(message)
+        .deleteMessage(this.getReceiptHandle(message))
         .thenAccept(
             v -> {
-              ScheduledFuture<?> future = this.heartbeatFutures.remove(message.messageId());
+              ScheduledFuture<?> future = this.heartbeatFutures.remove(message.getId());
               if (future != null) {
                 future.cancel(true);
               }
@@ -121,7 +126,8 @@ public class SqsConsumer implements MessageConsumer<Message> {
   @Override
   public CompletableFuture<Void> sendHeartbeat(Message message) {
     return this.sqsClient.changeMessageVisibility(
-        message, this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval() * 2);
+        this.getReceiptHandle(message),
+        this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval() * 2);
   }
 
   /**
@@ -139,7 +145,7 @@ public class SqsConsumer implements MessageConsumer<Message> {
     messages.forEach(
         message ->
             this.heartbeatFutures.put(
-                message.messageId(),
+                message.getId(),
                 this.executorService.scheduleAtFixedRate(
                     () -> {
                       try {
@@ -151,5 +157,17 @@ public class SqsConsumer implements MessageConsumer<Message> {
                     this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval(),
                     this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval(),
                     TimeUnit.SECONDS)));
+  }
+
+  private Message buildMessage(software.amazon.awssdk.services.sqs.model.Message message) {
+    return Message.builder()
+        .body(message.body())
+        .id(message.messageId())
+        .attributes(Map.of(RECEIPT_HANDLE, message.receiptHandle()))
+        .build();
+  }
+
+  private String getReceiptHandle(Message message) {
+    return message.getAttributes().get("RECEIPT_HANDLE").toString();
   }
 }

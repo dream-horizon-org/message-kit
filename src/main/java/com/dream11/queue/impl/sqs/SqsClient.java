@@ -85,15 +85,15 @@ public class SqsClient {
    * Deletes a message from the SQS queue. This is typically called after a message has been
    * successfully processed.
    *
-   * @param message The message to delete.
+   * @param receiptHandle The receipt handle of the message to delete.
    * @return A CompletableFuture that completes when the message is deleted.
    */
-  public CompletableFuture<Void> deleteMessage(Message message) {
+  public CompletableFuture<Void> deleteMessage(String receiptHandle) {
     return this.sqsAsyncClient
         .deleteMessage(
             DeleteMessageRequest.builder()
                 .queueUrl(sqsConfig.getQueueUrl())
-                .receiptHandle(message.receiptHandle())
+                .receiptHandle(receiptHandle)
                 .build())
         .thenAccept(__ -> {});
   }
@@ -118,16 +118,17 @@ public class SqsClient {
    * Changes the visibility timeout of a message. This is useful for extending the time a message is
    * invisible to other consumers.
    *
-   * @param message The message to change visibility for.
+   * @param receiptHandle The receipt handle message to change visibility for.
    * @param visibilityTimeout The new visibility timeout in seconds.
    * @return A CompletableFuture that completes when the message visibility is changed.
    */
-  public CompletableFuture<Void> changeMessageVisibility(Message message, int visibilityTimeout) {
+  public CompletableFuture<Void> changeMessageVisibility(
+      String receiptHandle, int visibilityTimeout) {
     return this.sqsAsyncClient
         .changeMessageVisibility(
             ChangeMessageVisibilityRequest.builder()
                 .queueUrl(this.sqsConfig.getQueueUrl())
-                .receiptHandle(message.receiptHandle())
+                .receiptHandle(receiptHandle)
                 .visibilityTimeout(visibilityTimeout)
                 .build())
         .thenAccept(__ -> {});
