@@ -143,20 +143,24 @@ public class SqsConsumer implements MessageConsumer {
 
   private void sendHeartbeats(List<Message> messages) {
     messages.forEach(
-        message ->
-            this.heartbeatFutures.put(
-                message.getId(),
-                this.executorService.scheduleAtFixedRate(
-                    () -> {
-                      try {
-                        this.sendHeartbeat(message);
-                      } catch (Exception e) {
-                        log.error("Failed to send heartbeat for message: {}", message, e);
-                      }
-                    },
-                    this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval(),
-                    this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval(),
-                    TimeUnit.SECONDS)));
+        message -> {
+          if (this.heartbeatFutures.containsKey(message.getId())) {
+            this.heartbeatFutures.get(message.getId()).cancel(true);
+          }
+          this.heartbeatFutures.put(
+              message.getId(),
+              this.executorService.scheduleAtFixedRate(
+                  () -> {
+                    try {
+                      this.sendHeartbeat(message);
+                    } catch (Exception e) {
+                      log.error("Failed to send heartbeat for message: {}", message, e);
+                    }
+                  },
+                  this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval(),
+                  this.getSqsConfig().getHeartbeatConfig().getHeartbeatInterval(),
+                  TimeUnit.SECONDS));
+        });
   }
 
   private Message buildMessage(software.amazon.awssdk.services.sqs.model.Message message) {
