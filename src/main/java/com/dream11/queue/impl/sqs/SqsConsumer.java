@@ -22,7 +22,8 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 @Slf4j
 public class SqsConsumer implements MessageConsumer {
 
-  private static final String RECEIPT_HANDLE = "RECEIPT_HANDLE";
+  public static final String RECEIPT_HANDLE = "RECEIPT_HANDLE";
+  public static final String RAW_MESSAGE = "RAW_MESSAGE";
   private final SqsClient sqsClient;
 
   @Getter private final SqsConfig sqsConfig;
@@ -167,7 +168,7 @@ public class SqsConsumer implements MessageConsumer {
     return Message.builder()
         .body(message.body())
         .id(message.messageId())
-        .attributes(Map.of(RECEIPT_HANDLE, message.receiptHandle()))
+        .attributes(Map.of(RECEIPT_HANDLE, message.receiptHandle(), RAW_MESSAGE, message))
         .build();
   }
 
