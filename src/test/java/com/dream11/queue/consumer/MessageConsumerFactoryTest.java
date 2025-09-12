@@ -19,7 +19,7 @@ class MessageConsumerFactoryTest {
         SqsConfig.builder().region("us-east-1").queueUrl("queue").endpoint(endpoint).build();
 
     // Act
-    MessageConsumer<String> messageConsumer = MessageConsumerFactory.create(sqsConfig);
+    MessageConsumer messageConsumer = MessageConsumerFactory.create(sqsConfig);
 
     // Assert
     assertThat(messageConsumer).isInstanceOf(SqsConsumer.class);

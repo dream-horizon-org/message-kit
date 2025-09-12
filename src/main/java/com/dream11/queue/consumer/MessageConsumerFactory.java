@@ -21,13 +21,12 @@ public class MessageConsumerFactory {
    * @param config The configuration for the message consumer.
    * @return A new MessageConsumer instance.
    * @throws IllegalArgumentException if the provider type is invalid.
-   * @param <T> The type of message that the consumer will handle.
    */
   @SuppressWarnings("unchecked")
-  public <T> MessageConsumer<T> create(@NonNull QueueConfig config) {
+  public MessageConsumer create(@NonNull QueueConfig config) {
     switch (config.getProvider()) {
       case SQS:
-        return (MessageConsumer<T>) new SqsConsumer((SqsConfig) config);
+        return new SqsConsumer((SqsConfig) config);
       default:
         throw new IllegalArgumentException(
             "Invalid message consumer type: " + config.getProvider());

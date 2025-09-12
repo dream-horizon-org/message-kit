@@ -22,7 +22,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
 import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest;
-import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.QueueAttributeName;
 
 @ExtendWith({Setup.class})
@@ -96,10 +95,20 @@ class SqsQueueIT {
 
     // Assert
     assertThat(firstMessages).hasSize(2);
-    assertThat(firstMessages.get(0).body()).isEqualTo(message1);
-    assertThat(firstMessages.get(1).body()).isEqualTo(message2);
+    assertThat(firstMessages.get(0).getBody()).isEqualTo(message1);
+    assertThat(firstMessages.get(0).getId()).isNotNull();
+    assertThat(firstMessages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
+    assertThat(firstMessages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+    assertThat(firstMessages.get(1).getBody()).isEqualTo(message2);
+    assertThat(firstMessages.get(1).getId()).isNotNull();
+    assertThat(firstMessages.get(1).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
+    assertThat(firstMessages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+
     assertThat(secondMessages).hasSize(1);
-    assertThat(secondMessages.get(0).body()).isEqualTo(message3);
+    assertThat(secondMessages.get(0).getBody()).isEqualTo(message3);
+    assertThat(secondMessages.get(0).getId()).isNotNull();
+    assertThat(secondMessages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
+    assertThat(secondMessages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
   }
 
   @Test
@@ -116,7 +125,10 @@ class SqsQueueIT {
 
     // Assert
     assertThat(messages).hasSize(1);
-    assertThat(messages.get(0).body()).isEqualTo(message.toUpperCase());
+    assertThat(messages.get(0).getBody()).isEqualTo(message.toUpperCase());
+    assertThat(messages.get(0).getId()).isNotNull();
+    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
+    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
   }
 
   @Test
@@ -132,7 +144,10 @@ class SqsQueueIT {
 
     // Assert
     assertThat(messages).hasSize(1);
-    assertThat(messages.get(0).body()).isEqualTo(message);
+    assertThat(messages.get(0).getBody()).isEqualTo(message);
+    assertThat(messages.get(0).getId()).isNotNull();
+    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
+    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
   }
 
   //
@@ -170,7 +185,10 @@ class SqsQueueIT {
 
     // Assert
     assertThat(messages).hasSize(1);
-    assertThat(messages.get(0).body()).isEqualTo(message);
+    assertThat(messages.get(0).getBody()).isEqualTo(message);
+    assertThat(messages.get(0).getId()).isNotNull();
+    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
+    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
     assertThat(
             SQS_ASYNC_CLIENT
                 .getQueueAttributes(
@@ -200,7 +218,10 @@ class SqsQueueIT {
     producer.send(message).get();
     List<Message> messages = sqsConsumer.receive().get();
     assertThat(messages).hasSize(1);
-    assertThat(messages.get(0).body()).isEqualTo(message);
+    assertThat(messages.get(0).getBody()).isEqualTo(message);
+    assertThat(messages.get(0).getId()).isNotNull();
+    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
+    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
 
     // Wait for heartbeat to be sent
     await()
@@ -223,7 +244,7 @@ class SqsQueueIT {
     SQS_PRODUCER.send(message).get();
     List<Message> messages = SQS_CONSUMER.receive().get();
     assertThat(messages).hasSize(1);
-    assertThat(messages.get(0).body()).isEqualTo(message);
+    assertThat(messages.get(0).getBody()).isEqualTo(message);
 
     // Wait for message to visible again
     await()
@@ -232,7 +253,11 @@ class SqsQueueIT {
             () -> {
               List<Message> newMessages = SQS_CONSUMER.receive().get();
               assertThat(newMessages).hasSize(1);
-              assertThat(newMessages.get(0).body()).isEqualTo(message);
+              assertThat(newMessages.get(0).getBody()).isEqualTo(message);
+              assertThat(messages.get(0).getId()).isNotNull();
+              assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+                  .isNotNull();
+              assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
               SQS_CONSUMER.acknowledgeMessage(newMessages.get(0)).get();
             });
   }

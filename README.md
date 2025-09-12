@@ -52,7 +52,7 @@ producer.close();
 
 ```java
 // Create a message consumer
-MessageConsumer<Message> consumer = MessageConsumerFactory.create(config);
+MessageConsumer consumer = MessageConsumerFactory.create(config);
 
 // Receive messages
 CompletableFuture<List<Message>> messages = consumer.receive();
