@@ -8,19 +8,19 @@
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>A lightweight Java library for working with message queues</description>
-  <url>https://github.com/dream-sports-labs/message-kit</url>
+  <url>https://github.com/ds-horizon/message-kit</url>
 
   <scm>
-    <developerConnection>scm:git:https://github.com/dream-sports-labs/message-kit.git</developerConnection>
-    <connection>scm:git:https://github.com/dream-sports-labs/message-kit.git</connection>
-    <url>https://github.com/dream-sports-labs/message-kit</url>
+    <developerConnection>scm:git:https://github.com/ds-horizon/message-kit.git</developerConnection>
+    <connection>scm:git:https://github.com/ds-horizon/message-kit.git</connection>
+    <url>https://github.com/ds-horizon/message-kit</url>
     <tag>HEAD</tag>
   </scm>
 
   <licenses>
     <license>
       <name>MIT License</name>
-      <url>https://github.com/dream-sports-labs/message-kit/raw/master/LICENSE</url>
+      <url>https://github.com/ds-horizon/message-kit/raw/master/LICENSE</url>
     </license>
   </licenses>
 
