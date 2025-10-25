@@ -1,5 +1,5 @@
 # Message Kit
-[![codecov](https://codecov.io/gh/dream-sports-labs/message-kit/graph/badge.svg?token=PANVES8PXA)](https://codecov.io/gh/dream-sports-labs/message-kit)
+[![codecov](https://codecov.io/gh/ds-horizon/message-kit/graph/badge.svg?token=PANVES8PXA)](https://codecov.io/gh/ds-horizon/message-kit)
 
 A lightweight Java library for working with message queues, currently supporting Amazon SQS.
 
