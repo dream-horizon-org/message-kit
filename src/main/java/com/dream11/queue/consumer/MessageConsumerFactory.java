@@ -27,6 +27,9 @@ public class MessageConsumerFactory {
     switch (config.getProvider()) {
       case SQS:
         return new SqsConsumer((SqsConfig) config);
+      case SNS:
+        throw new UnsupportedOperationException(
+            "SNS does not support consuming messages. Use subscriptions instead.");
       default:
         throw new IllegalArgumentException(
             "Invalid message consumer type: " + config.getProvider());
