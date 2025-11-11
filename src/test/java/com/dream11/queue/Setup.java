@@ -25,17 +25,20 @@ public class Setup
       DockerImageName localstackImage = DockerImageName.parse(Constants.LOCALSTACK_DOCKER_IMAGE);
       this.localStackContainer =
           new LocalStackContainer(localstackImage)
-              .withServices(LocalStackContainer.Service.SQS)
+              .withServices(LocalStackContainer.Service.SQS, LocalStackContainer.Service.SNS)
               .withStartupTimeout(Duration.ofSeconds(600));
 
       this.localStackContainer.start();
 
       String port = this.localStackContainer.getFirstMappedPort().toString();
-      log.info("Started localstack sqs container on port:{}", port);
+      log.info("Started localstack sqs and sns container on port:{}", port);
 
       System.setProperty(
           Constants.SQS_ENDPOINT,
           this.localStackContainer.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
+      System.setProperty(
+          Constants.SNS_ENDPOINT,
+          this.localStackContainer.getEndpointOverride(LocalStackContainer.Service.SNS).toString());
       System.setProperty(Constants.AWS_REGION, this.localStackContainer.getRegion());
       System.setProperty(Constants.AWS_ACCESS_KEY_ID, this.localStackContainer.getAccessKey());
       System.setProperty(Constants.AWS_SECRET_ACCESS_KEY, this.localStackContainer.getSecretKey());

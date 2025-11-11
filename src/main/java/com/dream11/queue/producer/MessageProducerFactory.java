@@ -1,6 +1,8 @@
 package com.dream11.queue.producer;
 
 import com.dream11.queue.config.QueueConfig;
+import com.dream11.queue.impl.sns.SnsConfig;
+import com.dream11.queue.impl.sns.SnsProducer;
 import com.dream11.queue.impl.sqs.SqsConfig;
 import com.dream11.queue.impl.sqs.SqsProducer;
 import lombok.NonNull;
@@ -27,6 +29,8 @@ public class MessageProducerFactory {
     switch (config.getProvider()) {
       case SQS:
         return new SqsProducer<>((SqsConfig) config);
+      case SNS:
+        return new SnsProducer<>((SnsConfig) config);
       default:
         throw new IllegalArgumentException(
             "Invalid message producer type: " + config.getProvider());

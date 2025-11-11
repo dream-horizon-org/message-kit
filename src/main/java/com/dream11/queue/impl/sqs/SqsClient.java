@@ -1,7 +1,9 @@
 package com.dream11.queue.impl.sqs;
 
+import com.dream11.queue.util.MessageAttributeConverter;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -10,6 +12,7 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClientBuilder;
 import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityRequest;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
@@ -77,6 +80,7 @@ public class SqsClient {
                 .queueUrl(this.sqsConfig.getQueueUrl())
                 .waitTimeSeconds(timeout)
                 .maxNumberOfMessages(this.sqsConfig.getReceiveConfig().getMaxMessages())
+                .messageAttributeNames("All")
                 .build())
         .thenApply(ReceiveMessageResponse::messages);
   }
@@ -105,13 +109,31 @@ public class SqsClient {
    * @return A CompletableFuture that completes when the message is sent.
    */
   public CompletableFuture<Void> send(String message) {
-    return this.sqsAsyncClient
-        .sendMessage(
-            SendMessageRequest.builder()
-                .queueUrl(sqsConfig.getQueueUrl())
-                .messageBody(message)
-                .build())
-        .thenAccept(__ -> {});
+    return send(message, Map.of());
+  }
+
+  /**
+   * Sends a message asynchronously to the SQS queue with custom attributes.
+   *
+   * @param message The message to send.
+   * @param attributes User-defined message attributes (can be null or empty).
+   * @return A CompletableFuture that completes when the message is sent.
+   */
+  public CompletableFuture<Void> send(String message, Map<String, Object> attributes) {
+    SendMessageRequest.Builder requestBuilder =
+        SendMessageRequest.builder().queueUrl(sqsConfig.getQueueUrl()).messageBody(message);
+
+    Map<String, MessageAttributeValue> messageAttributes =
+        MessageAttributeConverter.convert(
+            attributes,
+            (dataType, stringValue) ->
+                MessageAttributeValue.builder()
+                    .dataType(dataType)
+                    .stringValue(stringValue)
+                    .build());
+    requestBuilder.messageAttributes(messageAttributes);
+
+    return this.sqsAsyncClient.sendMessage(requestBuilder.build()).thenAccept(__ -> {});
   }
 
   /**

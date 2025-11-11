@@ -96,19 +96,25 @@ class SqsQueueIT {
     // Assert
     assertThat(firstMessages).hasSize(2);
     assertThat(firstMessages.get(0).getBody()).isEqualTo(message1);
-    assertThat(firstMessages.get(0).getId()).isNotNull();
-    assertThat(firstMessages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
-    assertThat(firstMessages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+    assertThat(firstMessages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(firstMessages.get(0).getMetadata().getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+        .isNotNull();
+    assertThat(firstMessages.get(0).getMetadata().getAttributes().get(SqsConsumer.RAW_MESSAGE))
+        .isNotNull();
     assertThat(firstMessages.get(1).getBody()).isEqualTo(message2);
-    assertThat(firstMessages.get(1).getId()).isNotNull();
-    assertThat(firstMessages.get(1).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
-    assertThat(firstMessages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+    assertThat(firstMessages.get(1).getMetadata().getId()).isNotNull();
+    assertThat(firstMessages.get(1).getMetadata().getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+        .isNotNull();
+    assertThat(firstMessages.get(0).getMetadata().getAttributes().get(SqsConsumer.RAW_MESSAGE))
+        .isNotNull();
 
     assertThat(secondMessages).hasSize(1);
     assertThat(secondMessages.get(0).getBody()).isEqualTo(message3);
-    assertThat(secondMessages.get(0).getId()).isNotNull();
-    assertThat(secondMessages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
-    assertThat(secondMessages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+    assertThat(secondMessages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(secondMessages.get(0).getMetadata().getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+        .isNotNull();
+    assertThat(secondMessages.get(0).getMetadata().getAttributes().get(SqsConsumer.RAW_MESSAGE))
+        .isNotNull();
   }
 
   @Test
@@ -126,9 +132,11 @@ class SqsQueueIT {
     // Assert
     assertThat(messages).hasSize(1);
     assertThat(messages.get(0).getBody()).isEqualTo(message.toUpperCase());
-    assertThat(messages.get(0).getId()).isNotNull();
-    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
-    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+    assertThat(messages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+        .isNotNull();
+    assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RAW_MESSAGE))
+        .isNotNull();
   }
 
   @Test
@@ -145,9 +153,11 @@ class SqsQueueIT {
     // Assert
     assertThat(messages).hasSize(1);
     assertThat(messages.get(0).getBody()).isEqualTo(message);
-    assertThat(messages.get(0).getId()).isNotNull();
-    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
-    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+    assertThat(messages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+        .isNotNull();
+    assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RAW_MESSAGE))
+        .isNotNull();
   }
 
   //
@@ -186,9 +196,11 @@ class SqsQueueIT {
     // Assert
     assertThat(messages).hasSize(1);
     assertThat(messages.get(0).getBody()).isEqualTo(message);
-    assertThat(messages.get(0).getId()).isNotNull();
-    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
-    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+    assertThat(messages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+        .isNotNull();
+    assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RAW_MESSAGE))
+        .isNotNull();
     assertThat(
             SQS_ASYNC_CLIENT
                 .getQueueAttributes(
@@ -219,9 +231,11 @@ class SqsQueueIT {
     List<Message> messages = sqsConsumer.receive().get();
     assertThat(messages).hasSize(1);
     assertThat(messages.get(0).getBody()).isEqualTo(message);
-    assertThat(messages.get(0).getId()).isNotNull();
-    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE)).isNotNull();
-    assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+    assertThat(messages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+        .isNotNull();
+    assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RAW_MESSAGE))
+        .isNotNull();
 
     // Wait for heartbeat to be sent
     await()
@@ -254,11 +268,82 @@ class SqsQueueIT {
               List<Message> newMessages = SQS_CONSUMER.receive().get();
               assertThat(newMessages).hasSize(1);
               assertThat(newMessages.get(0).getBody()).isEqualTo(message);
-              assertThat(messages.get(0).getId()).isNotNull();
-              assertThat(messages.get(0).getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
+              assertThat(messages.get(0).getMetadata().getId()).isNotNull();
+              assertThat(
+                      messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RECEIPT_HANDLE))
                   .isNotNull();
-              assertThat(messages.get(0).getAttributes().get(SqsConsumer.RAW_MESSAGE)).isNotNull();
+              assertThat(messages.get(0).getMetadata().getAttributes().get(SqsConsumer.RAW_MESSAGE))
+                  .isNotNull();
               SQS_CONSUMER.acknowledgeMessage(newMessages.get(0)).get();
             });
+  }
+
+  @Test
+  @SneakyThrows
+  void testSendAndReceiveWithMessageAttributes() {
+    // Arrange
+    String message = "test message with attributes";
+    Map<String, Object> attributes = Map.of("key1", "value1", "key2", "value2", "priority", 10);
+
+    // Act
+    SQS_PRODUCER.send(message, attributes).get();
+    List<Message> messages = SQS_CONSUMER.receive().get();
+    SQS_CONSUMER.acknowledgeMessage(messages.get(0)).get();
+
+    // Assert
+    assertThat(messages).hasSize(1);
+    assertThat(messages.get(0).getBody()).isEqualTo(message);
+    assertThat(messages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(messages.get(0).getAttributes()).isNotNull().hasSize(3);
+    assertThat(messages.get(0).getAttributes()).containsEntry("key1", "value1");
+    assertThat(messages.get(0).getAttributes()).containsEntry("key2", "value2");
+    assertThat(messages.get(0).getAttributes()).containsEntry("priority", "10");
+  }
+
+  @Test
+  @SneakyThrows
+  void testSendAndReceiveWithEmptyMessageAttributes() {
+    // Arrange
+    String message = "test message with empty attributes";
+    Map<String, Object> attributes = Map.of();
+
+    // Act
+    SQS_PRODUCER.send(message, attributes).get();
+    List<Message> messages = SQS_CONSUMER.receive().get();
+    SQS_CONSUMER.acknowledgeMessage(messages.get(0)).get();
+
+    // Assert
+    assertThat(messages).hasSize(1);
+    assertThat(messages.get(0).getBody()).isEqualTo(message);
+    assertThat(messages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(messages.get(0).getAttributes()).isEmpty();
+  }
+
+  @Test
+  @SneakyThrows
+  void testSendAndReceiveWithNullMessageAttributes() {
+    // Arrange
+    String message = "test message with null attributes";
+
+    // Act
+    SQS_PRODUCER.send(message, null).get();
+    List<Message> messages = SQS_CONSUMER.receive().get();
+    SQS_CONSUMER.acknowledgeMessage(messages.get(0)).get();
+
+    // Assert
+    assertThat(messages).hasSize(1);
+    assertThat(messages.get(0).getBody()).isEqualTo(message);
+    assertThat(messages.get(0).getMetadata().getId()).isNotNull();
+    assertThat(messages.get(0).getAttributes()).isEmpty();
+  }
+
+  @Test
+  @SneakyThrows
+  void testSupportsMessageAttributes() {
+    // Act
+    boolean supportsAttributes = SQS_PRODUCER.supportsMessageAttributes();
+
+    // Assert
+    assertThat(supportsAttributes).isTrue();
   }
 }

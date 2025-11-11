@@ -1,7 +1,9 @@
 package com.dream11.queue.impl.sqs;
 
 import com.dream11.queue.Message;
+import com.dream11.queue.Metadata;
 import com.dream11.queue.consumer.MessageConsumer;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -111,7 +113,8 @@ public class SqsConsumer implements MessageConsumer {
         .deleteMessage(this.getReceiptHandle(message))
         .thenAccept(
             v -> {
-              ScheduledFuture<?> future = this.heartbeatFutures.remove(message.getId());
+              ScheduledFuture<?> future =
+                  this.heartbeatFutures.remove(message.getMetadata().getId());
               if (future != null) {
                 future.cancel(true);
               }
@@ -145,11 +148,11 @@ public class SqsConsumer implements MessageConsumer {
   private void sendHeartbeats(List<Message> messages) {
     messages.forEach(
         message -> {
-          if (this.heartbeatFutures.containsKey(message.getId())) {
-            this.heartbeatFutures.get(message.getId()).cancel(true);
+          if (this.heartbeatFutures.containsKey(message.getMetadata().getId())) {
+            this.heartbeatFutures.get(message.getMetadata().getId()).cancel(true);
           }
           this.heartbeatFutures.put(
-              message.getId(),
+              message.getMetadata().getId(),
               this.executorService.scheduleAtFixedRate(
                   () -> {
                     try {
@@ -165,14 +168,29 @@ public class SqsConsumer implements MessageConsumer {
   }
 
   private Message buildMessage(software.amazon.awssdk.services.sqs.model.Message message) {
+    // Build system metadata
+    Map<String, Object> systemAttributes =
+        Map.of(RECEIPT_HANDLE, message.receiptHandle(), RAW_MESSAGE, message);
+
+    Metadata metadata =
+        Metadata.builder().id(message.messageId()).attributes(systemAttributes).build();
+
+    // Extract user-controlled message attributes from SQS message
+    Map<String, Object> userAttributes = new HashMap<>();
+    if (message.messageAttributes() != null) {
+      message
+          .messageAttributes()
+          .forEach((key, value) -> userAttributes.put(key, value.stringValue()));
+    }
+
     return Message.builder()
         .body(message.body())
-        .id(message.messageId())
-        .attributes(Map.of(RECEIPT_HANDLE, message.receiptHandle(), RAW_MESSAGE, message))
+        .metadata(metadata)
+        .attributes(userAttributes)
         .build();
   }
 
   private String getReceiptHandle(Message message) {
-    return message.getAttributes().get(RECEIPT_HANDLE).toString();
+    return message.getMetadata().getAttributes().get(RECEIPT_HANDLE).toString();
   }
 }

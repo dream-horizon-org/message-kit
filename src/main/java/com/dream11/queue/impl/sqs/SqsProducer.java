@@ -1,6 +1,7 @@
 package com.dream11.queue.impl.sqs;
 
 import com.dream11.queue.producer.MessageProducer;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +73,29 @@ public class SqsProducer<T> implements MessageProducer<T> {
   @Override
   public CompletableFuture<Void> send(T message) {
     return this.sqsClient.send(transformer.apply(message));
+  }
+
+  /**
+   * Sends a message asynchronously to the SQS queue with custom attributes. The message is
+   * transformed to a string before sending.
+   *
+   * @param message The message to send.
+   * @param attributes User-defined message attributes (e.g., routing keys, metadata).
+   * @return A CompletableFuture that completes when the message is sent.
+   */
+  @Override
+  public CompletableFuture<Void> send(T message, Map<String, Object> attributes) {
+    return this.sqsClient.send(transformer.apply(message), attributes);
+  }
+
+  /**
+   * Returns true as SQS supports message attributes.
+   *
+   * @return true indicating that message attributes are supported.
+   */
+  @Override
+  public boolean supportsMessageAttributes() {
+    return true;
   }
 
   /**
