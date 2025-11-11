@@ -109,7 +109,7 @@ public class SqsClient {
    * @return A CompletableFuture that completes when the message is sent.
    */
   public CompletableFuture<Void> send(String message) {
-    return send(message, null);
+    return send(message, Map.of());
   }
 
   /**
@@ -123,17 +123,15 @@ public class SqsClient {
     SendMessageRequest.Builder requestBuilder =
         SendMessageRequest.builder().queueUrl(sqsConfig.getQueueUrl()).messageBody(message);
 
-    if (attributes != null && !attributes.isEmpty()) {
-      Map<String, MessageAttributeValue> messageAttributes =
-          MessageAttributeConverter.convert(
-              attributes,
-              (dataType, stringValue) ->
-                  MessageAttributeValue.builder()
-                      .dataType(dataType)
-                      .stringValue(stringValue)
-                      .build());
-      requestBuilder.messageAttributes(messageAttributes);
-    }
+    Map<String, MessageAttributeValue> messageAttributes =
+        MessageAttributeConverter.convert(
+            attributes,
+            (dataType, stringValue) ->
+                MessageAttributeValue.builder()
+                    .dataType(dataType)
+                    .stringValue(stringValue)
+                    .build());
+    requestBuilder.messageAttributes(messageAttributes);
 
     return this.sqsAsyncClient.sendMessage(requestBuilder.build()).thenAccept(__ -> {});
   }

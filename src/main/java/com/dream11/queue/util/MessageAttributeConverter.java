@@ -36,7 +36,8 @@ public class MessageAttributeConverter {
    * String, Number, and Boolean types only. Unsupported types will cause an
    * IllegalArgumentException.
    *
-   * @param attributes The attributes to convert (must not contain null values)
+   * @param attributes The attributes to convert (can be null or empty, must not contain null
+   *     values)
    * @param attributeValueFactory Factory function that creates a service-specific
    *     MessageAttributeValue given a dataType and stringValue
    * @param <T> The AWS MessageAttributeValue type (e.g., SQS or SNS MessageAttributeValue)
@@ -45,6 +46,10 @@ public class MessageAttributeConverter {
    */
   public <T> Map<String, T> convert(
       Map<String, Object> attributes, BiFunction<String, String, T> attributeValueFactory) {
+
+    if (attributes == null || attributes.isEmpty()) {
+      return Map.of();
+    }
 
     Map<String, T> messageAttributes = new HashMap<>();
     attributes.forEach(

@@ -143,7 +143,7 @@ class SqsClientTest {
     String message = "test message";
 
     // Act
-    sqsClient.send(message, null).get();
+    sqsClient.send(message, Map.of()).get();
 
     // Assert
     ArgumentCaptor<SendMessageRequest> captor = ArgumentCaptor.forClass(SendMessageRequest.class);

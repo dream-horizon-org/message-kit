@@ -57,7 +57,7 @@ public class SnsClient {
    * @return A CompletableFuture that completes when the message is published.
    */
   public CompletableFuture<Void> publish(String message) {
-    return publish(message, null);
+    return publish(message, Map.of());
   }
 
   /**
@@ -71,17 +71,15 @@ public class SnsClient {
     PublishRequest.Builder requestBuilder =
         PublishRequest.builder().topicArn(snsConfig.getTopicArn()).message(message);
 
-    if (attributes != null && !attributes.isEmpty()) {
-      Map<String, MessageAttributeValue> messageAttributes =
-          MessageAttributeConverter.convert(
-              attributes,
-              (dataType, stringValue) ->
-                  MessageAttributeValue.builder()
-                      .dataType(dataType)
-                      .stringValue(stringValue)
-                      .build());
-      requestBuilder.messageAttributes(messageAttributes);
-    }
+    Map<String, MessageAttributeValue> messageAttributes =
+        MessageAttributeConverter.convert(
+            attributes,
+            (dataType, stringValue) ->
+                MessageAttributeValue.builder()
+                    .dataType(dataType)
+                    .stringValue(stringValue)
+                    .build());
+    requestBuilder.messageAttributes(messageAttributes);
 
     return this.snsAsyncClient.publish(requestBuilder.build()).thenAccept(__ -> {});
   }

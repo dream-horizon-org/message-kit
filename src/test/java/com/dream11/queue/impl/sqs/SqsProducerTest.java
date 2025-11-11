@@ -90,7 +90,7 @@ class SqsProducerTest {
     String message = "test message";
 
     // Act
-    producer.send(message, null).get();
+    producer.send(message, Map.of()).get();
 
     // Assert
     verify(mockSqsAsyncClient).sendMessage(any(SendMessageRequest.class));

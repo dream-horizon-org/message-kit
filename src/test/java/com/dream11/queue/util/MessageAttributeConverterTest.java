@@ -159,6 +159,16 @@ class MessageAttributeConverterTest {
     assertThat(result).isEmpty();
   }
 
+  @Test
+  void testConvertNullMap() {
+    // Arrange & Act
+    Map<String, TestAttributeValue> result =
+        MessageAttributeConverter.convert(null, TestAttributeValue::new);
+
+    // Assert
+    assertThat(result).isEmpty();
+  }
+
   // Test helper classes
   static class TestAttributeValue {
     final String dataType;

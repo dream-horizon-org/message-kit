@@ -146,7 +146,7 @@ class SnsClientTest {
     String message = "test message";
 
     // Act
-    snsClient.publish(message, null).get();
+    snsClient.publish(message, Map.of()).get();
 
     // Assert
     ArgumentCaptor<PublishRequest> captor = ArgumentCaptor.forClass(PublishRequest.class);

@@ -21,9 +21,6 @@ public class SnsConfig implements QueueConfig {
   /** The endpoint for the SNS topic. */
   private String endpoint;
 
-  /** The configuration for heartbeat settings (not used for SNS, but required by interface). */
-  @Builder.Default private HeartbeatConfig heartbeatConfig = new HeartbeatConfig();
-
   /**
    * Returns the provider type for this configuration.
    *
@@ -32,5 +29,10 @@ public class SnsConfig implements QueueConfig {
   @Override
   public QueueProvider getProvider() {
     return QueueProvider.SNS;
+  }
+
+  @Override
+  public HeartbeatConfig getHeartbeatConfig() {
+    throw new UnsupportedOperationException("Heartbeat config is not supported in SNS");
   }
 }

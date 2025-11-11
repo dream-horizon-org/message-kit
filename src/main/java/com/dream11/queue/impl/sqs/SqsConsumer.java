@@ -169,9 +169,8 @@ public class SqsConsumer implements MessageConsumer {
 
   private Message buildMessage(software.amazon.awssdk.services.sqs.model.Message message) {
     // Build system metadata
-    Map<String, Object> systemAttributes = new HashMap<>();
-    systemAttributes.put(RECEIPT_HANDLE, message.receiptHandle());
-    systemAttributes.put(RAW_MESSAGE, message);
+    Map<String, Object> systemAttributes =
+        Map.of(RECEIPT_HANDLE, message.receiptHandle(), RAW_MESSAGE, message);
 
     Metadata metadata =
         Metadata.builder().id(message.messageId()).attributes(systemAttributes).build();

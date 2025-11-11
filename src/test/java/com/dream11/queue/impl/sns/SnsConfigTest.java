@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.dream11.queue.QueueProvider;
-import com.dream11.queue.config.HeartbeatConfig;
 import org.junit.jupiter.api.Test;
 
 class SnsConfigTest {
@@ -15,14 +14,13 @@ class SnsConfigTest {
         SnsConfig.builder()
             .topicArn("arn:aws:sns:us-east-1:123456789012:test-topic")
             .region("us-east-1")
-            .heartbeatConfig(
-                HeartbeatConfig.builder().executorThreadPoolSize(5).heartbeatInterval(5).build())
             .build();
 
     // Act and Assert
     assertThat(snsConfig.getProvider()).isEqualTo(QueueProvider.SNS);
-    assertThat(snsConfig.getHeartbeatConfig().getHeartbeatInterval()).isEqualTo(5);
-    assertThat(snsConfig.getHeartbeatConfig().getExecutorThreadPoolSize()).isEqualTo(5);
+    assertThatThrownBy(snsConfig::getHeartbeatConfig)
+        .isInstanceOf(UnsupportedOperationException.class)
+        .hasMessage("Heartbeat config is not supported in SNS");
   }
 
   @Test
