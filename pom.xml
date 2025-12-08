@@ -46,7 +46,7 @@
     <lombok.version>1.18.24</lombok.version>
     <aws.java.sdk.version>2.20.25</aws.java.sdk.version>
     <slf4j.version>2.0.17</slf4j.version>
-    <logback.version>1.5.18</logback.version>
+    <logback.version>1.5.19</logback.version>
 
     <!--  Tests  -->
     <testcontainers.version>1.21.0</testcontainers.version>
