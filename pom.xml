@@ -52,7 +52,7 @@
     <testcontainers.version>1.21.0</testcontainers.version>
     <junit-jupiter.version>5.12.2</junit-jupiter.version>
     <junit.version>4.13.2</junit.version>
-    <assertj.version>3.27.3</assertj.version>
+    <assertj.version>3.27.7</assertj.version>
     <awaitility.version>4.3.0</awaitility.version>
     <mockito-junit-jupiter.version>5.17.0</mockito-junit-jupiter.version>
     <jackson.version>2.20.1</jackson.version>
